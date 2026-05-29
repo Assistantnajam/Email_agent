@@ -1,0 +1,300 @@
+{
+  "name": "Email_agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "e0eedec3-8c36-42ef-82df-bc5a602a1f13",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "0Y51pbPaN82a04PV",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "order",
+              "description": "when any email come with the text inside include new order it will seperate it"
+            },
+            {
+              "category": "inquiry",
+              "description": "if any email include words  inquiry or customer is asking any type of question need to seperate it"
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "Return only raw valid JSON. Do not use markdown, code blocks, or backticks. No explanation, just JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        0
+      ],
+      "id": "afb49481-9ca8-4911-a313-b9367200b49a",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.text }}",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        -48
+      ],
+      "id": "cda5b11d-b57b-42c7-b29e-15c5892cf291",
+      "name": "Send Order Draft",
+      "webhookId": "3bf4e614-3398-4109-9475-44ea3165922f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZqqzOZUeYFXN607n",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ $json.text }}",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        736,
+        208
+      ],
+      "id": "ec8de216-17a2-4bc0-a60c-e02ffa702056",
+      "name": "Send Inquiry Draft",
+      "webhookId": "ff5d4b12-5f95-4783-a28a-d86946d27a2f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ZqqzOZUeYFXN607n",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional email assistant. Reply to this email politely:\n{{ $json.snippet }}\n\nyou have to give me reply in two types one in subject line and the other is email response.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        432,
+        -112
+      ],
+      "id": "aad4c361-bfeb-4369-b480-be88b7df88ae",
+      "name": "Draft Order Reply"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a professional email assistant. Reply to this email politely:\n\n{{ $json.snippet }}\nyou have to give me reply in two types one in subject line and the other is email response.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        384,
+        224
+      ],
+      "id": "2eebac30-ddab-4241-8358-dda1e1a827f3",
+      "name": "Draft Inquiry Reply"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        64,
+        240
+      ],
+      "id": "6b8c6139-7474-4bf3-a566-e5d6f3523db7",
+      "name": "Groq (Classifier)",
+      "credentials": {
+        "groqApi": {
+          "id": "IwMNPRylIPGZTL6V",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        496,
+        64
+      ],
+      "id": "5a189926-2cca-4941-915e-bf97db2c6633",
+      "name": "Groq (Order)",
+      "credentials": {
+        "groqApi": {
+          "id": "IwMNPRylIPGZTL6V",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        576,
+        416
+      ],
+      "id": "a5e1163b-5457-44ad-8e2e-326bb78091cc",
+      "name": "Groq (Inquiry)",
+      "credentials": {
+        "groqApi": {
+          "id": "IwMNPRylIPGZTL6V",
+          "name": "Groq account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Draft Order Reply",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Draft Inquiry Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Inquiry Draft": {
+      "main": [
+        []
+      ]
+    },
+    "Draft Order Reply": {
+      "main": [
+        [
+          {
+            "node": "Send Order Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Draft Inquiry Reply": {
+      "main": [
+        [
+          {
+            "node": "Send Inquiry Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq (Classifier)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq (Order)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Draft Order Reply",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq (Inquiry)": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Draft Inquiry Reply",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "9e468c98-229b-46e3-a435-b1e16400d29d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "854aa144ffd72dd1574e4e111d41d792ca220aa01130a33ce46fa6be5d034c59"
+  },
+  "id": "4BoyjHURckyw6yqm",
+  "tags": []
+}
