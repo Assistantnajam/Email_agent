@@ -25,6 +25,12 @@ Gmail Trigger → Text Classifier → [Order path] → Groq (Order) → Draft Or
 | Groq (Inquiry) | Drafts replies for inquiry emails |
 | Gmail (Draft) | Saves AI-generated drafts to Gmail |
 
+## Screenshots
+
+![Workflow Overview](screenshot1.png)
+![Workflow Execution](screenshot2.png)
+![Chat Demo](screenshot3.png)
+
 ## Prerequisites
 
 - n8n instance (cloud or self-hosted)
